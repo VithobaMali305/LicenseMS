@@ -12,10 +12,7 @@
 ## Quick Start
 
 ### 1. Clone / Extract
-
-```bash
-cd LicenseManagementSystem
-```
+https://github.com/VithobaMali305/LicenseMS.git
 
 ### 2. Configure Connection String
 Edit `src/LicenseService/appsettings.json`:
@@ -25,7 +22,6 @@ Edit `src/LicenseService/appsettings.json`:
 > For full SQL Server: `Server=.;Database=LicenseManagementDB;Trusted_Connection=True;TrustServerCertificate=True`
 
 ### 3. Apply Database Migrations
-
 dotnet ef migrations add InitialCreate --project src/LicenseService
 dotnet ef database update --project src/LicenseService
 
