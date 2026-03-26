@@ -1,0 +1,167 @@
+@model WebUI.Models.UserDashboardViewModel
+@{
+    ViewData["Title"] = "My Dashboard";
+    ViewData["ActivePage"] = "UserDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pb-5">
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <div class="page-header d-flex align-items-center justify-content-between">
+        <div>
+            <h4 class="mb-0">
+                <i class="bi bi-house-door me-2"></i>Welcome, @Model.Username
+            </h4>
+            <small class="text-muted">Manage and track your license applications</small>
+        </div>
+        <a asp-controller="Dashboard" asp-action="Apply"
+           class="btn text-white fw-semibold" style="background:var(--gov-accent);">
+            <i class="bi bi-plus-circle me-2"></i>Apply for License
+        </a>
+    </div>
+
+    <!-- ── Quick Stats ───────────────────────────────────────────────────── -->
+    @{
+        var total    = Model.Licenses.Count;
+        var pending  = Model.Licenses.Count(l => l.Status == "Pending");
+        var approved = Model.Licenses.Count(l => l.Status == "Approved");
+        var rejected = Model.Licenses.Count(l => l.Status == "Rejected");
+    }
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card text-center p-3">
+                <div class="fw-bold" style="font-size:1.8rem;color:var(--gov-blue);">@total</div>
+                <div class="text-muted small">Total Applications</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card pending text-center p-3">
+                <div class="fw-bold" style="font-size:1.8rem;color:#856404;">@pending</div>
+                <div class="text-muted small">Pending</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card approved text-center p-3">
+                <div class="fw-bold" style="font-size:1.8rem;color:#146c43;">@approved</div>
+                <div class="text-muted small">Approved</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card stat-card rejected text-center p-3">
+                <div class="fw-bold" style="font-size:1.8rem;color:#b02a37;">@rejected</div>
+                <div class="text-muted small">Rejected</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── My Licenses Table ─────────────────────────────────────────────── -->
+    <div class="card shadow-sm">
+        <div class="card-header py-3 d-flex align-items-center justify-content-between"
+             style="background:var(--gov-blue);color:#fff;">
+            <span class="fw-semibold">
+                <i class="bi bi-file-earmark-text me-2"></i>My License Applications
+            </span>
+            <a asp-controller="Dashboard" asp-action="Apply"
+               class="btn btn-light btn-sm fw-semibold">
+                <i class="bi bi-plus me-1"></i>New Application
+            </a>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.Licenses.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="bi bi-folder2-open fs-1 text-muted d-block mb-3"></i>
+                    <p class="text-muted mb-3">You have no license applications yet.</p>
+                    <a asp-controller="Dashboard" asp-action="Apply"
+                       class="btn text-white" style="background:var(--gov-accent);">
+                        <i class="bi bi-plus-circle me-2"></i>Apply for Your First License
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table gov-table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>License Type</th>
+                                <th>Status</th>
+                                <th>Applied Date</th>
+                                <th>Last Updated</th>
+                                <th>Document</th>
+                                <th>Review Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lic in Model.Licenses)
+                            {
+                                <tr>
+                                    <td><span class="text-muted small">#@lic.Id</span></td>
+                                    <td class="fw-semibold">@lic.LicenseType</td>
+                                    <td>
+                                        <span class="badge badge-@lic.Status.ToLower() px-3 py-1">
+                                            @if (lic.Status == "Pending")
+                                            {
+                                                <i class="bi bi-clock me-1"></i>
+                                            }
+                                            else if (lic.Status == "Approved")
+                                            {
+                                                <i class="bi bi-check-circle me-1"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-x-circle me-1"></i>
+                                            }
+                                            @lic.Status
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">
+                                        @lic.AppliedDate.ToString("dd MMM yyyy")
+                                    </td>
+                                    <td class="small text-muted">
+                                        @(lic.UpdatedAt.HasValue
+                                            ? lic.UpdatedAt.Value.ToString("dd MMM yyyy")
+                                            : "—")
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(lic.DocumentPath))
+                                        {
+                                            <a href="http://localhost:5002/@lic.DocumentPath"
+                                               target="_blank"
+                                               class="btn btn-outline-secondary btn-sm py-0">
+                                                <i class="bi bi-paperclip me-1"></i>View
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
+                                    </td>
+                                    <td class="small">
+                                        @if (!string.IsNullOrEmpty(lic.ReviewNotes))
+                                        {
+                                            <span class="text-muted fst-italic" title="@lic.ReviewNotes">
+                                                @(lic.ReviewNotes.Length > 40
+                                                    ? lic.ReviewNotes.Substring(0, 40) + "…"
+                                                    : lic.ReviewNotes)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="card-footer text-muted small py-2">
+            @Model.Licenses.Count application(s) total
+        </div>
+    </div>
+</div>

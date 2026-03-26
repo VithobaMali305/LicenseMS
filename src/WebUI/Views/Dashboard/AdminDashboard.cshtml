@@ -1,0 +1,224 @@
+@model WebUI.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    ViewData["ActivePage"] = "AdminDashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pb-5">
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <div class="page-header d-flex align-items-center justify-content-between">
+        <div>
+            <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h4>
+            <small class="text-muted">Overview of all license applications and system statistics</small>
+        </div>
+        <span class="badge bg-danger px-3 py-2">
+            <i class="bi bi-shield-fill me-1"></i>Administrator
+        </span>
+    </div>
+
+    <!-- ── Stat Cards ────────────────────────────────────────────────────── -->
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between p-4">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase mb-1">Total Users</div>
+                        <div class="fw-bold" style="font-size:2rem;color:var(--gov-blue);">@Model.TotalUsers</div>
+                    </div>
+                    <i class="bi bi-people-fill stat-icon text-primary"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card h-100">
+                <div class="card-body d-flex align-items-center justify-content-between p-4">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase mb-1">Total Licenses</div>
+                        <div class="fw-bold" style="font-size:2rem;color:var(--gov-blue);">@Model.TotalLicenses</div>
+                    </div>
+                    <i class="bi bi-file-earmark-text-fill stat-icon text-secondary"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card pending h-100">
+                <div class="card-body d-flex align-items-center justify-content-between p-4">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase mb-1">Pending Review</div>
+                        <div class="fw-bold" style="font-size:2rem;color:#856404;">@Model.PendingCount</div>
+                    </div>
+                    <i class="bi bi-clock-history stat-icon text-warning"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card stat-card approved h-100">
+                <div class="card-body d-flex align-items-center justify-content-between p-4">
+                    <div>
+                        <div class="text-muted small fw-semibold text-uppercase mb-1">Approved</div>
+                        <div class="fw-bold" style="font-size:2rem;color:#146c43;">@Model.ApprovedCount</div>
+                    </div>
+                    <i class="bi bi-check-circle-fill stat-icon text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Applications Table ────────────────────────────────────────────── -->
+    <div class="card shadow-sm">
+        <div class="card-header d-flex align-items-center justify-content-between py-3"
+             style="background:var(--gov-blue);color:#fff;">
+            <span class="fw-semibold">
+                <i class="bi bi-card-list me-2"></i>All License Applications
+            </span>
+            <!-- Status Filter -->
+            <form method="get" asp-action="AdminDashboard" class="d-flex align-items-center gap-2 m-0">
+                <label class="text-white-50 small me-1">Filter:</label>
+                <select name="status" id="statusFilter" class="form-select form-select-sm"
+                        style="width:160px;">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.StatusFilter))">All Statuses</option>
+                    <option value="Pending"  selected="@(Model.StatusFilter=="Pending")">Pending</option>
+                    <option value="Approved" selected="@(Model.StatusFilter=="Approved")">Approved</option>
+                    <option value="Rejected" selected="@(Model.StatusFilter=="Rejected")">Rejected</option>
+                </select>
+            </form>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.Licenses.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    No applications found@(string.IsNullOrEmpty(Model.StatusFilter) ? "." : $" with status \"{Model.StatusFilter}\".")
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table gov-table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>Applicant</th>
+                                <th>License Type</th>
+                                <th>Status</th>
+                                <th>Applied Date</th>
+                                <th>Document</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lic in Model.Licenses)
+                            {
+                                <tr>
+                                    <td><span class="text-muted small">#@lic.Id</span></td>
+                                    <td>
+                                        <i class="bi bi-person-circle me-1 text-muted"></i>
+                                        @lic.Username
+                                    </td>
+                                    <td>@lic.LicenseType</td>
+                                    <td>
+                                        <span class="badge badge-@lic.Status.ToLower() px-3 py-1">
+                                            @lic.Status
+                                        </span>
+                                    </td>
+                                    <td class="small text-muted">@lic.AppliedDate.ToString("dd MMM yyyy")</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(lic.DocumentPath))
+                                        {
+                                            <a href="http://localhost:5002/@lic.DocumentPath"
+                                               target="_blank" class="btn btn-outline-secondary btn-sm py-0">
+                                                <i class="bi bi-paperclip me-1"></i>View
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (lic.Status == "Pending")
+                                        {
+                                            <!-- Approve -->
+                                            <form asp-action="UpdateStatus" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="LicenseId" value="@lic.Id" />
+                                                <input type="hidden" name="NewStatus" value="Approved" />
+                                                <button type="submit"
+                                                        class="btn btn-success btn-sm py-0 btn-status-action"
+                                                        data-action="approve" data-id="@lic.Id">
+                                                    <i class="bi bi-check-lg me-1"></i>Approve
+                                                </button>
+                                            </form>
+                                            <!-- Reject -->
+                                            <button type="button" class="btn btn-danger btn-sm py-0 ms-1"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#rejectModal"
+                                                    data-id="@lic.Id">
+                                                <i class="bi bi-x-lg me-1"></i>Reject
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small fst-italic">Reviewed</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="card-footer text-muted small py-2">
+            Showing @Model.Licenses.Count application(s)
+            @if (!string.IsNullOrEmpty(Model.StatusFilter))
+            {
+                <span>· Filtered by: <strong>@Model.StatusFilter</strong></span>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ── Reject Modal ──────────────────────────────────────────────────────── -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background:var(--gov-blue);color:#fff;">
+                <h5 class="modal-title">
+                    <i class="bi bi-x-circle me-2"></i>Reject Application
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="UpdateStatus" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" name="LicenseId" id="rejectLicenseId" value="" />
+                    <input type="hidden" name="NewStatus" value="Rejected" />
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Review Notes (Optional)</label>
+                        <textarea name="ReviewNotes" class="form-control" rows="3"
+                                  placeholder="Provide a reason for rejection..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-lg me-1"></i>Confirm Rejection
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const rejectModal = document.getElementById('rejectModal');
+    rejectModal.addEventListener('show.bs.modal', e => {
+        const btn = e.relatedTarget;
+        document.getElementById('rejectLicenseId').value = btn.dataset.id;
+    });
+</script>
+}

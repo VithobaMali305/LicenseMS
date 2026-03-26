@@ -1,0 +1,79 @@
+@model WebUI.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="col-12 col-sm-9 col-md-6 col-lg-4">
+
+        <!-- Crest / Brand -->
+        <div class="text-center mb-4">
+            <div class="mb-3">
+                <i class="bi bi-shield-check text-white" style="font-size:3.5rem;"></i>
+            </div>
+            <h4 class="text-white fw-bold mb-0">License Management System</h4>
+            <p class="text-white-50 small">Government Technology Division</p>
+        </div>
+
+        <div class="card gov-card">
+            <div class="card-header py-3">
+                <h5 class="mb-0 text-center">
+                    <i class="bi bi-lock-fill me-2"></i>Secure Sign In
+                </h5>
+            </div>
+            <div class="card-body p-4">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success py-2">
+                        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Username
+                        </label>
+                        <input asp-for="Username" class="form-control"
+                               placeholder="Enter your username" autocomplete="username" />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-key me-1"></i>Password
+                        </label>
+                        <input asp-for="Password" class="form-control"
+                               placeholder="Enter your password" autocomplete="current-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn w-100 text-white fw-semibold"
+                            style="background:var(--gov-accent);">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-light">
+                <span class="small text-muted">Don't have an account?</span>
+                <a asp-action="Register" class="ms-1 small fw-semibold">Register here</a>
+            </div>
+        </div>
+
+        <p class="text-center text-white-50 small mt-3">
+            <i class="bi bi-shield-lock me-1"></i>
+            This system is for authorised government personnel only.
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

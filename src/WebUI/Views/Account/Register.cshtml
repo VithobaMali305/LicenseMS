@@ -1,0 +1,78 @@
+@model WebUI.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="col-12 col-sm-9 col-md-6 col-lg-4">
+
+        <div class="text-center mb-4">
+            <i class="bi bi-person-plus text-white" style="font-size:3rem;"></i>
+            <h4 class="text-white fw-bold mt-2 mb-0">Create Account</h4>
+            <p class="text-white-50 small">License Management System</p>
+        </div>
+
+        <div class="card gov-card">
+            <div class="card-header py-3">
+                <h5 class="mb-0 text-center">
+                    <i class="bi bi-person-badge me-2"></i>New User Registration
+                </h5>
+            </div>
+            <div class="card-body p-4">
+
+                <form asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Username
+                        </label>
+                        <input asp-for="Username" class="form-control"
+                               placeholder="Choose a username (min. 3 chars)" />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-key me-1"></i>Password
+                        </label>
+                        <input asp-for="Password" class="form-control"
+                               placeholder="Min. 8 characters" autocomplete="new-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ConfirmPassword" class="form-label">
+                            <i class="bi bi-key-fill me-1"></i>Confirm Password
+                        </label>
+                        <input asp-for="ConfirmPassword" class="form-control"
+                               placeholder="Re-enter password" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <div class="alert alert-info py-2 small mb-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        New accounts are created with <strong>User</strong> role.
+                        Contact admin for elevated access.
+                    </div>
+
+                    <button type="submit" class="btn w-100 text-white fw-semibold"
+                            style="background:var(--gov-accent);">
+                        <i class="bi bi-person-plus me-2"></i>Create Account
+                    </button>
+                </form>
+            </div>
+            <div class="card-footer text-center py-3 bg-light">
+                <span class="small text-muted">Already have an account?</span>
+                <a asp-action="Login" class="ms-1 small fw-semibold">Sign in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

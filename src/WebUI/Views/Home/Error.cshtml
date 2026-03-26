@@ -1,0 +1,24 @@
+@{
+    var code = (int)(ViewData["StatusCode"] ?? 500);
+    var (icon, title, msg) = code switch {
+        401 => ("bi-lock-fill",            "Unauthorised",   "You must be logged in to access this page."),
+        403 => ("bi-shield-x",             "Forbidden",      "You do not have permission to view this resource."),
+        404 => ("bi-search",               "Page Not Found", "The page you requested could not be found."),
+        _   => ("bi-exclamation-triangle", "Server Error",   "An unexpected error occurred. Please try again later.")
+    };
+    ViewData["Title"] = title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex align-items-center justify-content-center min-vh-100">
+    <div class="text-center">
+        <i class="bi @icon text-danger" style="font-size:5rem;"></i>
+        <h1 class="display-1 fw-bold mt-3" style="color:var(--gov-blue);">@code</h1>
+        <h4 class="fw-semibold mb-3">@title</h4>
+        <p class="text-muted mb-4">@msg</p>
+        <a asp-controller="Account" asp-action="Login"
+           class="btn text-white" style="background:var(--gov-accent);">
+            <i class="bi bi-house me-2"></i>Return to Login
+        </a>
+    </div>
+</div>

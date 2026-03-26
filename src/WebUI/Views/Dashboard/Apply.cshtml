@@ -1,0 +1,124 @@
+@model WebUI.Models.ApplyLicenseViewModel
+@{
+    ViewData["Title"] = "Apply for License";
+    ViewData["ActivePage"] = "Apply";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid pb-5">
+
+    <!-- ── Page Header ──────────────────────────────────────────────────── -->
+    <div class="page-header">
+        <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Apply for a License</h4>
+        <small class="text-muted">
+            Complete the form below. Your application will be reviewed by an administrator.
+        </small>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+
+            <!-- Info banner -->
+            <div class="alert alert-info d-flex align-items-start gap-2 mb-4">
+                <i class="bi bi-info-circle-fill mt-1 flex-shrink-0"></i>
+                <div class="small">
+                    <strong>How it works:</strong> Your document will be securely uploaded first,
+                    then your application will be submitted. You'll receive a confirmation once processed.
+                    Supported files: <strong>PDF, JPG, PNG, DOCX</strong> (max 10 MB).
+                </div>
+            </div>
+
+            <div class="card gov-form-card">
+                <div class="card-header py-3">
+                    <i class="bi bi-file-earmark-plus me-2"></i>License Application Form
+                </div>
+                <div class="card-body p-4">
+
+                    <form asp-action="Apply" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger py-2 small"></div>
+
+                        <!-- License Type -->
+                        <div class="mb-4">
+                            <label asp-for="LicenseType" class="form-label">
+                                <i class="bi bi-tag me-1"></i>License Type
+                                <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="LicenseType" class="form-select">
+                                <option value="">— Select a license type —</option>
+                                @foreach (var type in WebUI.Models.ApplyLicenseViewModel.LicenseTypes)
+                                {
+                                    <option value="@type">@type</option>
+                                }
+                            </select>
+                            <span asp-validation-for="LicenseType" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Document Upload -->
+                        <div class="mb-4">
+                            <label asp-for="Document" class="form-label">
+                                <i class="bi bi-paperclip me-1"></i>Supporting Document
+                                <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Document"
+                                   type="file"
+                                   id="fileInput"
+                                   class="form-control"
+                                   accept=".pdf,.jpg,.jpeg,.png,.docx" />
+                            <div id="filePreview" class="mt-2"></div>
+                            <div class="form-text text-muted small">
+                                Accepted: PDF, JPG, PNG, DOCX &nbsp;|&nbsp; Max size: 10 MB
+                            </div>
+                            <span asp-validation-for="Document" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Declaration -->
+                        <div class="mb-4 p-3 border rounded bg-light">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="declaration" required />
+                                <label class="form-check-label small" for="declaration">
+                                    I declare that the information provided is accurate and complete.
+                                    I understand that submitting false information may result in rejection
+                                    and possible legal action.
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn text-white fw-semibold flex-fill"
+                                    style="background:var(--gov-accent);">
+                                <i class="bi bi-send me-2"></i>Submit Application
+                            </button>
+                            <a asp-controller="Dashboard" asp-action="UserDashboard"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+            <!-- What happens next -->
+            <div class="card mt-4 border-0 bg-light">
+                <div class="card-body">
+                    <h6 class="fw-bold text-muted mb-3">
+                        <i class="bi bi-arrow-right-circle me-2"></i>What happens next?
+                    </h6>
+                    <ol class="small text-muted mb-0 ps-3">
+                        <li class="mb-1">Your document is securely uploaded to our system.</li>
+                        <li class="mb-1">Your application is submitted with status <strong>Pending</strong>.</li>
+                        <li class="mb-1">An administrator will review your application.</li>
+                        <li>You will be notified of the outcome via email.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
